@@ -26,7 +26,7 @@ my $app = sub {
         my $res =
             "StorePath: $storePath\n" .
             "URL: nar/$hashPart.nar.bz2\n" .
-            "Compression: bzip2\n" .
+            "Compression: none\n" .
             "NarHash: $narHash\n" .
             "NarSize: $narSize\n";
         $res .= "References: " . join(" ", map { stripPath($_) } @$refs) . "\n"
@@ -50,7 +50,7 @@ my $app = sub {
         my $storePath = queryPathFromHashPart($hashPart);
         return [404, ['Content-Type' => 'text/plain'], ["No such path.\n"]] unless $storePath;
         my $fh = new IO::Handle;
-        open $fh, "nix-store --dump '$storePath' | bzip2 |";
+        open $fh, "nix-store --dump '$storePath' |";
         return [200, ['Content-Type' => 'text/plain'], $fh];
     }
 
