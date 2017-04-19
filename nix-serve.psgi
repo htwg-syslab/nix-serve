@@ -25,8 +25,8 @@ my $app = sub {
         my ($deriver, $narHash, $time, $narSize, $refs) = queryPathInfo($storePath, 1) or die;
         my $res =
             "StorePath: $storePath\n" .
-            "URL: nar/$hashPart.nar.bz2\n" .
-            "Compression: bzip2\n" .
+            "URL: nar/$hashPart.nar\n" .
+            "Compression: none\n" .
             "NarHash: $narHash\n" .
             "NarSize: $narSize\n";
         $res .= "References: " . join(" ", map { stripPath($_) } @$refs) . "\n"
@@ -45,12 +45,12 @@ my $app = sub {
         return [200, ['Content-Type' => 'text/x-nix-narinfo'], [$res]];
     }
 
-    elsif ($path =~ "/nar/([0-9a-z]+)\.nar.bz2") {
+    elsif ($path =~ "/nar/([0-9a-z]+)\.nar") {
         my $hashPart = $1;
         my $storePath = queryPathFromHashPart($hashPart);
         return [404, ['Content-Type' => 'text/plain'], ["No such path.\n"]] unless $storePath;
         my $fh = new IO::Handle;
-        open $fh, "nix-store --dump '$storePath' | bzip2 |";
+        open $fh, "nix-store --dump '$storePath' |";
         return [200, ['Content-Type' => 'text/plain'], $fh];
     }
 
